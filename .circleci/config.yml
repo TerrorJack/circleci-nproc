@@ -1,0 +1,19 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: terrorjack/pixie:latest
+    steps:
+      - run:
+          name: Run the experiment
+          command: |
+            nix-channel --add https://releases.nixos.org/nixpkgs/nixpkgs-19.03pre157960.722fcbbb80b nixpkgs
+            nix-channel --update
+            nix-env -u
+            nix-env -iA \
+              nixpkgs.coreutils \
+              nixpkgs.ghc
+            nproc
+            printf "import GHC.Conc\nmain :: IO ()\nmain = getNumProcessors >>= print\n" > nproc.hs
+            runghc nproc.hs
